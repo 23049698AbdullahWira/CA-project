@@ -11,10 +11,14 @@ const port = 3000;
 
 // MySQL connection configuration
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'books'
+    //host: 'localhost',
+    //user: 'root',
+    //password: '',
+    //database: 'books'
+    host: 'mysql-abdullahwira.alwaysdata.net',
+    user: '371307',
+    password: 'Wira_23049698!',
+    database: 'abdullahwira_project'
 });
 
 // Connect to MySQL

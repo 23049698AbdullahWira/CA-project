@@ -74,7 +74,7 @@ function checkAuth(req, res, next) {
 // Routes for CRUD operations
 // Default route - Load books for all users, redirect to login for certain actions
 app.get('/', (req, res) => {
-    connection.query('SELECT * FROM Books', (err, rows) => {
+    connection.query('SELECT * FROM books', (err, rows) => {
         if (err) throw err;
 
         const images = getImagePaths('images');
@@ -86,7 +86,7 @@ app.get('/', (req, res) => {
 // Search bar 
 app.get('/search', (req, res) => {
     const query = req.query.query.toLowerCase();
-    connection.query('SELECT * FROM Books WHERE LOWER(title) LIKE ?', [`%${query}%`], (err, rows) => {
+    connection.query('SELECT * FROM books WHERE LOWER(title) LIKE ?', [`%${query}%`], (err, rows) => {
         if (err) throw err;
 
         res.render('index', { books: rows, images: getImagePaths('images'), uploads: getImagePaths('uploads'), user: req.session.user });
@@ -96,13 +96,13 @@ app.get('/search', (req, res) => {
 // Get a specific book by ID
 app.get('/books/:id', function (req, res) {
     const bookId = parseInt(req.params.id);
-    connection.query('SELECT * FROM Books WHERE id = ?', [bookId], (err, rows) => {
+    connection.query('SELECT * FROM books WHERE id = ?', [bookId], (err, rows) => {
         if (err) throw err;
 
         if (rows.length > 0) {
             res.render('bookInfo', { book: rows[0], user: req.session.user });
         } else {
-            res.status(404).send('Book not found');
+            res.status(404).send('book not found');
         }
     });
 });
@@ -118,7 +118,7 @@ app.post('/books', checkAuth, upload.fields([{ name: 'cover', maxCount: 1 }, { n
     const cover = req.files['cover'] ? '/uploads/' + req.files['cover'][0].filename : null;
     const readLink = req.files['readLink'] ? '/pdfs/' + req.files['readLink'][0].filename : null;
 
-    connection.query('INSERT INTO Books (title, description, author, pages, cover, readLink) VALUES (?, ?, ?, ?, ?, ?)',
+    connection.query('INSERT INTO books (title, description, author, pages, cover, readLink) VALUES (?, ?, ?, ?, ?, ?)',
         [title, description, author, pages, cover, readLink],
         (err, result) => {
             if (err) throw err;
@@ -131,13 +131,13 @@ app.post('/books', checkAuth, upload.fields([{ name: 'cover', maxCount: 1 }, { n
 // Update a book by ID - Display update form
 app.get('/books/:id/update', checkAuth, function (req, res) {
     const bookId = parseInt(req.params.id);
-    connection.query('SELECT * FROM Books WHERE id = ?', [bookId], (err, rows) => {
+    connection.query('SELECT * FROM books WHERE id = ?', [bookId], (err, rows) => {
         if (err) throw err;
 
         if (rows.length > 0) {
             res.render('updatebook', { updatebook: rows[0] });
         } else {
-            res.status(404).send('Book not found');
+            res.status(404).send('book not found');
         }
     });
 });
@@ -149,12 +149,12 @@ app.post('/books/:id/update', checkAuth, upload.fields([{ name: 'cover', maxCoun
     const cover = req.files['cover'] ? '/uploads/' + req.files['cover'][0].filename : null;
     const readLink = req.files['readLink'] ? '/pdfs/' + req.files['readLink'][0].filename : null;
 
-    connection.query('UPDATE Books SET title = ?, description = ?, author = ?, pages = ?, cover = ?, readLink = ? WHERE id = ?',
+    connection.query('UPDATE books SET title = ?, description = ?, author = ?, pages = ?, cover = ?, readLink = ? WHERE id = ?',
         [title, description, author, pages, cover, readLink, bookId],
         (err, result) => {
             if (err) throw err;
 
-            console.log('Book updated successfully.');
+            console.log('book updated successfully.');
             res.redirect('/');
         });
 });
@@ -162,10 +162,10 @@ app.post('/books/:id/update', checkAuth, upload.fields([{ name: 'cover', maxCoun
 // Delete a book by ID
 app.get('/books/:id/delete', checkAuth, function (req, res) {
     const bookId = parseInt(req.params.id);
-    connection.query('DELETE FROM Books WHERE id = ?', [bookId], (err, result) => {
+    connection.query('DELETE FROM books WHERE id = ?', [bookId], (err, result) => {
         if (err) throw err;
 
-        console.log('Book deleted successfully.');
+        console.log('book deleted successfully.');
         res.redirect('/');
     });
 });
